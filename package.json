@@ -9,6 +9,7 @@
   "author": "RejectKid",
   "license": "ISC",
   "dependencies": {
+    "big.js": "^6.0.3",
     "jquery": "^3.6.0",
     "seeded-rand": "^2.0.1"
   }

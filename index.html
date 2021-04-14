@@ -3,6 +3,7 @@
         <title>Coin flipping</title>
         <script src="jquery.min.js"></script>
         <script src="jsrand.min.js"></script>
+        <script src="big.js"></script>
         <meta name="viewport" content="width=410">
         <style>
             html { padding: 5px; margin: 0x; }
@@ -207,8 +208,8 @@
                         after();
                     }
                     else {
-                        var p = parseInt($('#power').val()) * Math.pow(2, wins);
-                        var t = parseInt($('#toughness').val()) * Math.pow(2, wins);
+					    var p = new Big( parseInt($('#power').val())).times(new Big(2).pow(wins));
+                        var t = new Big( parseInt($('#toughness').val())).times(new Big(2).pow(wins));
                         var power = ' (' + p + '/' + t + ' Okaun)';
                         $('#count').html('<b class="green">'+wins + ' wins' + power+'</b>');
                         $('#losses').html('<b class="red">'+losses + ' losses </b>');
