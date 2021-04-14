@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=410">
         <style>
             html { padding: 5px; margin: 0x; }
-            body { width: 400px; padding: 0px; margin: 0px; font-size: 15px; background: black; color: white; }
+            body { width: 500px; padding: 0px; margin: 0px; font-size: 15px; background: black; color: white; }
             input { width: 100%; margin: 5px; padding: 6px; text-align: center; }
             input[type=checkbox] { width: 28px !important; height: 28px; }
             ul, li { list-style: none; margin: 0px; padding: 0px; }
@@ -112,11 +112,15 @@
     </head>
     <body>
         <div class='bg'></div>
-        <div class='row'>            
+        <div class='row'>        
+			<label class='f3'>
+                <input id='okaunInPlay' type='checkbox'>
+            </label>
+			<span>Okaun in play</span>		
             <label class='f3'>
                 <input id='hasThumb' type='checkbox'>
             </label>
-            <span>Krark's Thumb in play</span>
+			<span>Krark's Thumb in play</span>
             <label class='f1 right'>
                 <input type='number' class='num' id='thumbs' value='1'>
             </label>
@@ -208,9 +212,16 @@
                         after();
                     }
                     else {
-					    var p = new Big( parseInt($('#power').val())).times(new Big(2).pow(wins));
+						var p = new Big( parseInt($('#power').val())).times(new Big(2).pow(wins));
                         var t = new Big( parseInt($('#toughness').val())).times(new Big(2).pow(wins));
-                        var power = ' (' + p + '/' + t + ' Okaun)';
+						var okaunInPlay = $('#okaunInPlay').prop('checked');
+						//john cena
+						if(p.toNumber() > 40 && okaunInPlay){
+							var audio = new Audio("john-cena_5.mp3");
+							audio.play();
+						}
+						
+                        var power = okaunInPlay ? ' (' + p + '/' + t + ' Okaun)' : '';
                         $('#count').html('<b class="green">'+wins + ' wins' + power+'</b>');
                         $('#losses').html('<b class="red">'+losses + ' losses </b>');
                         running = false;
