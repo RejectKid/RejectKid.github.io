@@ -37,6 +37,37 @@
                 width: 100%;
 				background-size: contain;
 			}
+			.boom{
+				background: url(boom.gif) no-repeat;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
+			.over9000{
+				background: url(over9000.gif) no-repeat;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
+			.dmx{
+				background: url(dmx.gif) no-repeat;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
+			.powerOfGod{
+				background: url(powerOfGod.gif) no-repeat;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
+			.hugeBitch{
+				background: url(hugeBitch.gif) no-repeat;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
+			
             .num { width: 100px; }
 
             .coin {
@@ -155,6 +186,34 @@
             var running = false;
             var pause = false;
             var after = false;
+			var easterEgg = null;
+			var easterEggs = [
+				{
+					audio: new Audio("john-cena_5.mp3"), 
+					cssClass: "johnCena"
+				},
+				{
+					audio: new Audio("boom_13.mp3"), 
+					cssClass: "boom"
+				},
+				{
+					audio: new Audio("over-9000.mp3"), 
+					cssClass: "over9000"
+				},
+				{
+					audio: new Audio("dmx.mp3"), 
+					cssClass: "dmx"
+				},
+				{
+					audio: new Audio("powerOfGod.mp3"), 
+					cssClass: "powerOfGod"
+				},
+				{
+					audio: new Audio("huge-bitch.mp3"), 
+					cssClass: "hugeBitch"
+				},
+			];
+			
 
             function clear() {
                 $('#count').html('<b>...</b>');
@@ -215,14 +274,15 @@
 						var p = new Big( parseInt($('#power').val())).times(new Big(2).pow(wins));
                         var t = new Big( parseInt($('#toughness').val())).times(new Big(2).pow(wins));
 						var okaunInPlay = $('#okaunInPlay').prop('checked');
-						//john cena
+						//easter eggs
 						if(p.toNumber() > 40 && okaunInPlay){
-							var audio = new Audio("john-cena_5.mp3");
-							audio.play();
-							$('#background').removeClass().addClass("johnCena");
-							setTimeout( function(){ 
+							easterEgg = easterEggs[random(0, easterEggs.length - 1)];
+							easterEgg.audio.play();
+							$('#background').removeClass().addClass(easterEgg.cssClass);
+							
+							easterEgg.audio.onended = function(){
 								$('#background').removeClass().addClass("bg");
-							}  , 11500 );
+							}
 						}
 						
                         var power = okaunInPlay ? ' (' + p + '/' + t + ' Okaun)' : '';
@@ -249,6 +309,12 @@
 
             function initflip(flips)
             {
+				$('#background').removeClass().addClass("bg");
+				if(easterEgg){
+					easterEgg.audio.pause();
+					easterEgg.audio.currentTime = 0;
+				}
+				
                 if (running) 
                 {
                     pause = true;
