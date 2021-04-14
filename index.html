@@ -1,0 +1,278 @@
+<html>
+    <head>
+        <title>Coin flipping</title>
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="node_modules/seeded-rand/dist/jsrand.min.js"></script>
+        <meta name="viewport" content="width=410">
+        <style>
+            html { padding: 5px; margin: 0x; }
+            body { width: 400px; padding: 0px; margin: 0px; font-size: 15px; background: black; color: white; }
+            input { width: 100%; margin: 5px; padding: 6px; text-align: center; }
+            input[type=checkbox] { width: 28px !important; height: 28px; }
+            ul, li { list-style: none; margin: 0px; padding: 0px; }
+            li { margin-bottom: 3px; }
+            img { width: 50px; }
+            #count b { display: block; text-align: center; padding: 10px; font-size: 200%; }
+            #losses b { display: block; text-align: center; padding: 10px; font-size: 200%; }
+            .row { display: flex; line-height: 38px; }
+            .row span { display: inline-flex; width: 100%; }
+            .f1 { flex-grow: 1; }
+            .f3 { flex-grow: 10; }
+            .right { text-align: right; }
+            .tall { padding-top: 20px; padding-bottom: 20px; }
+            .borderify .thumbResult { padding-bottom: 1px; border-bottom: 1px solid black; }
+            .thumbResult { display: inline-block; }
+            .winner { display: inline-block; }
+            .loser { display: inline-block; opacity: 0.33; }
+            .green { color: #00cc00; }
+            .red { color: #cc0000; }
+            .bg {
+                z-index: -100;
+                 background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.8), rgba(0,0,0,0)), url(okaun.jpg) bottom  no-repeat; 
+                 position: fixed;
+                 left: 0px;
+                 bottom: 0px;
+                 right: 0px;
+                 height: 303px;  
+                 width: 100%;
+            }
+            .num { width: 100px; }
+
+            .coin {
+                position: relative;
+                margin: 0 auto;
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+                display: inline-block;
+            }
+
+            .coin div {
+                width: 100%;
+                height: 100%;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                border-radius: 50%;
+                -webkit-box-shadow: inset 0 0 45px rgba(0,0,0,.3), 0 12px 20px -10px rgba(0,0,0,.4);
+                -moz-box-shadow: inset 0 0 45px rgba(0,0,0,.3), 0 12px 20px -10px rgba(0,0,0,.4);
+                box-shadow: inset 0 0 45px rgba(0,0,0,.3), 0 12px 20px -10px rgba(0,0,0,.4);
+            }
+            .side-a {
+                background: url('heads.png') no-repeat;
+                background-size: contain;
+            }
+
+            .side-b {
+                background: url('tails.png') no-repeat;
+                background-size: contain;
+            }
+
+            .coin {
+                transition: -webkit-transform 2s ease-in;
+                -webkit-transform-style: preserve-3d;
+            }
+
+            .coin div {
+                position: absolute;
+                -webkit-backface-visibility: hidden;
+            }
+
+            .side-a {
+                z-index: 100;
+            }
+
+            .side-b {
+                -webkit-transform: rotateY(-180deg);
+            }
+
+            .coin.heads {
+                -webkit-animation: flipHeads .1s ease-out forwards;
+                -moz-animation: flipHeads .1s ease-out forwards;
+                -o-animation: flipHeads .1s ease-out forwards;
+                animation: flipHeads .1s ease-out forwards;
+            }
+
+            .coin.tails {
+                -webkit-animation: flipTails .1s ease-out forwards;
+                -moz-animation: flipTails .1s ease-out forwards;
+                -o-animation: flipTails .1s ease-out forwards;
+                animation: flipTails .1s ease-out forwards;
+            }
+
+            @-webkit-keyframes flipHeads {
+                from { -webkit-transform: rotateY(0); -moz-transform: rotateY(0); transform: rotateY(0); }
+                to { -webkit-transform: rotateY(1800deg); -moz-transform: rotateY(1800deg); transform: rotateY(1800deg); }
+            }
+            @-webkit-keyframes flipTails {
+                from { -webkit-transform: rotateY(0); -moz-transform: rotateY(0); transform: rotateY(0); }
+                to { -webkit-transform: rotateY(1980deg); -moz-transform: rotateY(1980deg); transform: rotateY(1980deg); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class='bg'></div>
+        <div class='row'>            
+            <label class='f3'>
+                <input id='hasThumb' type='checkbox'>
+            </label>
+            <span>Krark's Thumb in play</span>
+            <label class='f1 right'>
+                <input type='number' class='num' id='thumbs' value='1'>
+            </label>
+        </div>
+        <div class='row'>
+            <input type='button' id='flip' value='Flip once'>
+        </div>
+        <div class='row'>
+            <input type='button' id='flip2' value='Flip twice'>
+        </div>
+        <div class='row'>
+            <input type='number' id='flips' value='3'>
+            <input type='button' id='flipN' value='Flip N times'>
+        </div>
+        <div class='row'>
+                <input class='num' type='number' id='power' value='3'> /
+                <input class='num' type='number' id='toughness' value='3'>
+                <span class='right'>Okaun power/toughness</span>
+        </div>
+        <div class='row'>
+            <input type='button' id='flip-lose' value='Flip until lose' class='tall'>
+            <input type='button' id='flip-lose2' value='Flip until lose twice' class='tall'>
+        </div>
+        <div id='count'></div>
+        <div id='losses'></div>
+
+        <script>
+			const rnd = new Srand();
+			var wins = 0;
+			var losses = 0;
+            var animation = 100;
+            var running = false;
+            var pause = false;
+            var after = false;
+
+            function clear() {
+                $('#count').html('<b>...</b>');
+                wins = 0;
+				losses = 0;
+                running = false;
+            }
+
+            function random(min, max) {			
+                return rnd.intInRange(min,max);
+            }
+
+            function flip(times) {
+                var thumbs = $('#hasThumb').prop('checked') ? parseInt($('#thumbs').val()) : 0;
+                var flips = Math.pow(2, thumbs);
+                
+                var coinStr = '';
+                for (var i = 0; i < flips; i++)
+                {
+                    coinStr += '<div class="coin"><div class="side-a"></div><div class="side-b"></div></div>';
+                }
+                $('.coin').addClass('heads');
+                setTimeout(function() { showResult(times, thumbs); }, animation);
+            }
+
+            function showResult(times, thumbs) {			
+                if (pause)
+                {
+                    pause = false;
+                    running = false;
+                    return;
+                }
+
+                var result = makeThumbResults(thumbs);
+
+                if (result == 1) {
+                    wins = wins + 1;
+                }
+				else{
+					losses = losses + 1;
+				}
+
+                $('#count').html('<b class="green">' + wins + '..</b>');
+                $('#losses').html('<b class="red">' + losses + '..</b>');
+
+                if (result == 1 && times < 0) {
+                    flip(times);
+                }
+                else if (times > 1)
+                {
+                    flip(times - 1);
+                }
+                else {
+                    if (after) {
+                        after();
+                    }
+                    else {
+                        var p = parseInt($('#power').val()) * Math.pow(2, wins);
+                        var t = parseInt($('#toughness').val()) * Math.pow(2, wins);
+                        var power = ' (' + p + '/' + t + ' Okaun)';
+                        $('#count').html('<b class="green">'+wins + ' wins' + power+'</b>');
+                        $('#losses').html('<b class="red">'+losses + ' losses </b>');
+                        running = false;
+                        pause = false;
+                    }
+                }
+            }
+
+            function makeThumbResults(thumbs) {
+                if (thumbs > 0) {
+                    var a = makeThumbResults(thumbs - 1);
+                    var b = makeThumbResults(thumbs - 1);
+                    var result = b > a ? b : a;
+                    return result;
+                }
+                else {
+                    var result = random(0, 1);
+                    return result;
+                }                
+            }
+
+            function initflip(flips)
+            {
+                if (running) 
+                {
+                    pause = true;
+                    setTimeout(function() { initflip(flips); }, 100);
+                    return;
+                }
+
+                clear();
+                running = true;
+                pause = false;
+
+                flip(flips);
+
+                if (flips == -2) {
+                    after = function() {
+                        after = false;
+                        flip(flips);
+                    };
+                }
+                else {
+                    after = false;
+                }
+            }
+
+            $('#flip-lose').on('click', function() {
+                initflip(-1);
+            });
+            $('#flip-lose2').on('click', function() {
+                initflip(-2);
+            });
+            $('#flip').on('click', function() {
+                initflip(1);
+            });
+            $('#flip2').on('click', function() {
+                initflip(2);
+            });
+            $('#flipN').on('click', function() {
+                var times = parseInt($('#flips').val());
+                initflip(times);
+            });
+        </script>
+    </body>
+</html>
