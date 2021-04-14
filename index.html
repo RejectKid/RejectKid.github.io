@@ -12,7 +12,6 @@
             input[type=checkbox] { width: 28px !important; height: 28px; }
             ul, li { list-style: none; margin: 0px; padding: 0px; }
             li { margin-bottom: 3px; }
-            img { width: 50px; }
             #count b { display: block; text-align: center; padding: 10px; font-size: 200%; }
             #losses b { display: block; text-align: center; padding: 10px; font-size: 200%; }
             .row { display: flex; line-height: 38px; }
@@ -28,15 +27,18 @@
             .green { color: #00cc00; }
             .red { color: #cc0000; }
             .bg {
-                z-index: -100;
-                 background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.8), rgba(0,0,0,0)), url(okaun.jpg) bottom  no-repeat; 
-                 position: fixed;
-                 left: 0px;
-                 bottom: 0px;
-                 right: 0px;
+                 z-index: -100;
+                 background: url(okaun.jpg) no-repeat; 
                  height: 303px;  
                  width: 100%;
             }
+			.johnCena{
+				background: url(johnCena.gif) no-repeat;
+				z-index: -100;
+                height: 303px;  
+                width: 100%;
+				background-size: contain;
+			}
             .num { width: 100px; }
 
             .coin {
@@ -111,7 +113,7 @@
         </style>
     </head>
     <body>
-        <div class='bg'></div>
+        <div id="background" class='bg'></div>
         <div class='row'>        
 			<label class='f3'>
                 <input id='okaunInPlay' type='checkbox'>
@@ -219,6 +221,10 @@
 						if(p.toNumber() > 40 && okaunInPlay){
 							var audio = new Audio("john-cena_5.mp3");
 							audio.play();
+							$('#background').removeClass().addClass("johnCena");
+							setTimeout( function(){ 
+								$('#background').removeClass().addClass("bg");
+							}  , 11500 );
 						}
 						
                         var power = okaunInPlay ? ' (' + p + '/' + t + ' Okaun)' : '';
